@@ -1,0 +1,9 @@
+{
+    "money": 500,
+    "reputation": 0,
+    "inventory": {},
+    "owned_properties": [],
+    "property_levels": {
+        "small_shop": 1
+    }
+}
