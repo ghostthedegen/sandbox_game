@@ -6,7 +6,10 @@ class BankAccount:
 
     def deposit(self, player, amount):
 
-        if player.money >= amount:
+        if amount <= 0:
+            print("Amount must be above 0")
+
+        elif player.money >= amount:
             player.money -= amount
             self.balance += amount
             self.transactions.append(f"Deposit: £{amount}")
@@ -20,7 +23,10 @@ class BankAccount:
 
     def withdraw(self, player, amount):
 
-        if self.balance >= amount:
+        if amount <= 0:
+            print("Amount must be above 0")
+
+        elif self.balance >= amount:
             self.balance -= amount
             player.money += amount
             self.transactions.append(f"Withdraw: £{amount}")
@@ -34,7 +40,10 @@ class BankAccount:
 
     def transfer(self, other_account, amount):
 
-        if self.balance >= amount:
+        if amount <= 0:
+            print("Amount must be above 0")
+
+        elif self.balance >= amount:
             self.balance -= amount
             other_account.balance += amount
 
