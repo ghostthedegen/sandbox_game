@@ -34,7 +34,10 @@ def remove_item(inventory, item):
    
 def buy_item(money, inventory, item, shop, quantity):
 
-    if item in shop:
+    if quantity <= 0:
+        print("Quantity must be above 0")
+
+    elif item in shop:
         print(f"Current item in the inventory: {inventory}")
         price = shop[item]
 

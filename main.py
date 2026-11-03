@@ -28,7 +28,7 @@ from time_system import (
     day,
     time_remaining
 )
-from nigh_store import get_customer_options
+from night_store import get_customer_options
 from bank import BankAccount
 
 
@@ -60,6 +60,23 @@ print(f"Inventory: {player.inventory}")
 print(f"Owned Properties: {player.owned_properties}")
 
 
+def ask_number(prompt):
+
+    while True:
+        answer = input(prompt)
+
+        try:
+            number = int(answer)
+        except ValueError:
+            print("Please enter a whole number")
+            continue
+
+        if number <= 0:
+            print("Please enter a number above 0")
+        else:
+            return number
+
+
 def rank_rep(reputation, shop, sell_prices, customer_options):
 
     if reputation >= 5 and "protein" not in shop:
@@ -79,7 +96,7 @@ while player.alive:
 
     action = input(
         "Chose an action: View Status, Buy Stock, Serve Customer, "
-        "Buy property, View properties, View current customer, "
+        "Skip Customer, Buy property, View properties, View current customer, "
         "Upgrade property, Save game, Load game, Bank, Quit ? "
     ).lower()
 
@@ -111,7 +128,7 @@ while player.alive:
 
             item = input("What do you want to buy? ").lower()
 
-            quantity = int(input("How many do you want? "))
+            quantity = ask_number("How many do you want? ")
 
             player.money, player.inventory = buy_item(
                 player.money,
@@ -173,6 +190,19 @@ while player.alive:
 
         else:
             print(f"Customer still wants: {current_order}")
+
+    elif action == "skip customer":
+
+        print(f"The customer who wanted {customer_queue[0]} walks out")
+
+        if player.reputation > 0:
+            player.reputation -= 1
+            print(f"Reputation dropped to {player.reputation}")
+
+        customer_queue = replace_customer(
+            customer_queue,
+            customer_options
+        )
 
     elif action == "view current customer":
         print(f"Customer queue: {customer_queue}")
@@ -248,11 +278,11 @@ while player.alive:
                 print(f"Bank balance: ${bank.balance}")
 
             elif bank_action == "deposit":
-                amount = int(input("How much do you want to deposit? "))
+                amount = ask_number("How much do you want to deposit? ")
                 bank.deposit(player, amount)
 
             elif bank_action == "withdraw":
-                amount = int(input("How much do you want to withdraw ? "))
+                amount = ask_number("How much do you want to withdraw ? ")
                 bank.withdraw(player, amount)
 
             elif bank_action == "exit":
