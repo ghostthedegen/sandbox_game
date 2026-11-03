@@ -14,7 +14,9 @@ from shop import (
     add_item,
     remove_item,
     buy_item,
-    sell_item
+    sell_item,
+    show_inventory,
+    calculate_restock
 )
 from customers import (
     complete_order,
@@ -97,7 +99,7 @@ while player.alive:
     action = input(
         "Chose an action: View Status, Buy Stock, Serve Customer, "
         "Skip Customer, Buy property, View properties, View current customer, "
-        "Upgrade property, Save game, Load game, Bank, Quit ? "
+        "Upgrade property, Save game, Load game, Bank, View inventory, Restock, Quit ? "
     ).lower()
 
     time_of_day, phase_start_time, day = update_time_of_day(
@@ -292,7 +294,61 @@ while player.alive:
                 print("Incorrect input")
                 
 
-            
+    elif action == "view inventory":
+        show_inventory(player.inventory, sell_prices)
+
+    elif action == "restock":
+
+        item = input("What item do you want to restock? ").lower()
+
+        if item not in shop:
+            print("This item does not exist")
+
+        else:
+            target_stock = ask_number("What is your target stock? ")
+
+            stock = player.inventory.get(item, 0)
+
+            missing_stock = calculate_restock(
+                player.inventory,
+                item,
+                target_stock
+            )
+
+            print("\n========== RESTOCK ==========")
+            print(f"Product: {item}")
+            print(f"Current stock: {stock}")
+            print(f"Target stock: {target_stock}")
+            print(f"Stock needed: {missing_stock}")
+
+            if missing_stock == 0:
+                print("You already have enough stock!")
+
+            else:
+                price = shop[item] * missing_stock
+
+                print(f"Price per item: ${shop[item]}")
+                print(f"Total cost: ${price}")
+                print(f"Available money: ${player.money}")
+
+                question = input(
+                    "Would you like to purchase? (yes/no): "
+                ).lower()
+
+                if question == "yes" or question == "y":
+
+                    player.money, player.inventory = buy_item(
+                        player.money,
+                        player.inventory,
+                        item,
+                        shop,
+                        missing_stock
+                    )
+
+                else:
+                    print("Restock cancelled")
+
+            print("=============================")
 
     elif action == "quit":
         player.alive = False

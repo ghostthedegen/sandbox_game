@@ -71,3 +71,80 @@ def sell_item(money, inventory, item, sell_prices):
         print("You don't own the item")
     
     return money, inventory
+
+def show_inventory(inventory, sell_prices):
+
+    if not inventory:
+        print("Inventory is empty")
+        return
+
+    print("\n========== INVENTORY ==========")
+
+    for item in inventory:
+
+        stock = inventory[item]
+        price = sell_prices[item]
+
+        if stock == 0:
+            status = "OUT OF STOCK"
+
+        elif 0 < stock <= 2:
+            status = "LOW STOCK"
+
+        else:
+            status = "GOOD STOCK"
+
+        print(f"{item:<15} | Stock: {stock:<5} | Price: ${price} | {status}")
+
+    print("================================")
+
+def calculate_restock(inventory, item, target_stock):
+
+    if target_stock < 0:
+        return 0
+
+    stock = inventory.get(item, 0)
+
+    missing_stock = target_stock - stock
+
+    if missing_stock <= 0:
+        return 0
+
+    return missing_stock
+
+def calculate_inventory_value(inventory, shop):
+
+    total_cost = 0
+
+    print("========== INVENTORY VALUE ==========")
+
+    for item in inventory:
+
+        quantity = inventory[item]
+        price = shop[item]
+        
+
+        total_value = price * quantity
+
+        total_cost += total_value
+
+        print(f"{item:<15} | {quantity:<5} | ${price} | ${total_value}")
+
+    print("=====================================")
+    print(f"Total inventory value: ${total_cost}")
+
+    return total_cost
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
