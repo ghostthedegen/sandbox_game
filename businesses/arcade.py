@@ -1,3 +1,5 @@
+from businesses.names import find_name
+
 arcades = {
     "Pixel Palace": 15000,
     "Retro Haven": 30000,
@@ -15,9 +17,9 @@ def buy_arcade(money, owned_arcades, arcades):
     for place, price in arcades.items():
         print(f"{place}:{price}")
 
-    question = input("What arcade would you like to buy ? ")
+    question = find_name(input("What arcade would you like to buy ? "), arcades)
 
-    if question not in arcades:
+    if question is None:
         print("Arcade does not exist")
         return money, owned_arcades
 

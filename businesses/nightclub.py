@@ -1,3 +1,5 @@
+from businesses.names import find_name
+
 nightclubs = {
     "Downtown Club": 50000,
     "Neon Palace": 75000,
@@ -24,9 +26,9 @@ def buy_nightclub(money, owned_nightclubs, nightclubs):
     for place, price in nightclubs.items():
         print(f"{place}:{price}")
 
-    question = input("Which club do you want to buy ? ")
+    question = find_name(input("Which club do you want to buy ? "), nightclubs)
 
-    if question not in nightclubs:
+    if question is None:
         print("This nightclub does not exist")
         return money, owned_nightclubs
 

@@ -58,7 +58,7 @@ def buy_property(money, property_name, owned_properties):
 
         elif money >= cost:
             print(f"Money: ${money}")
-            answer = input("Are you sure you want to purchase the property ? ").lower()
+            answer = input("Are you sure you want to purchase the property ? ").strip().lower()
             if answer == "yes" or answer == "y":
                 money -= cost
                 owned_properties.append(building)
