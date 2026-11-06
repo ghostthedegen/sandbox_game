@@ -9,7 +9,9 @@ sell_prices = {
     "coffee": 30,
     "energy": 25,
     "snack": 18,
-    "night_drink": 80
+    "night_drink": 80,
+    "protein": 60,
+    "premium_coffee": 110
 }
 
 def add_item(inventory, item, quantity):
@@ -83,7 +85,7 @@ def show_inventory(inventory, sell_prices):
     for item in inventory:
 
         stock = inventory[item]
-        price = sell_prices[item]
+        price = sell_prices.get(item, 0)
 
         if stock == 0:
             status = "OUT OF STOCK"

@@ -28,20 +28,38 @@ from time_system import (
     time_of_day,
     phase_start_time,
     day,
-    time_remaining
+    time_remaining,
+    phase_elapsed,
+    phase_start_from_elapsed
 )
+
+from car_dealership import (
+    car_shop_inventory,
+    car_sell_prices,
+    buy_car,
+    sell_car,
+    show_garage
+)
+
 from night_store import get_customer_options
 from bank import BankAccount
-
+from arcade import arcades, arcade_income, buy_arcade, collect_arcade_income
+from nightclub import nightclubs, nightclub_income, buy_nightclub, collect_nightclub_income
 
 class Player:
     def __init__(self, name):
         self.name = name
         self.money = 500
+        self.dirty_money = 0
         self.reputation = 0
         self.inventory = {}
-        self.alive = True
         self.owned_properties = []
+        self.owned_nightclubs = []
+        self.owned_arcades = []
+        self.alive = True
+        self.owned_cars = {}
+        self.last_arcade_collection_day = 0
+        self.last_club_collection_day = 0
 
 
 name = input("What is your name? ")
@@ -79,17 +97,15 @@ def ask_number(prompt):
             return number
 
 
-def rank_rep(reputation, shop, sell_prices, customer_options):
+def rank_rep(reputation, shop, customer_options):
 
     if reputation >= 5 and "protein" not in shop:
         shop["protein"] = 40
-        sell_prices["protein"] = 60
         customer_options.append("protein")
         print("NEW ITEM UNLOCKED: protein")
 
     if reputation >= 10 and "premium_coffee" not in shop:
         shop["premium_coffee"] = 75
-        sell_prices["premium_coffee"] = 110
         customer_options.append("premium_coffee")
         print("NEW ITEM UNLOCKED: premium coffee")
 
@@ -99,7 +115,8 @@ while player.alive:
     action = input(
         "Chose an action: View Status, Buy Stock, Serve Customer, "
         "Skip Customer, Buy property, View properties, View current customer, "
-        "Upgrade property, Save game, Load game, Bank, View inventory, Restock, Quit ? "
+        "Upgrade property, Save game, Load game, Bank, View inventory, Restock, Buy arcade, "
+        "Collect arcade income, Buy nightclub, collect club income, Buy car, Sell car, View garage, Quit ? "
     ).lower()
 
     time_of_day, phase_start_time, day = update_time_of_day(
@@ -181,7 +198,6 @@ while player.alive:
             rank_rep(
                 player.reputation,
                 shop,
-                sell_prices,
                 customer_options
             )
 
@@ -249,26 +265,48 @@ while player.alive:
             player.inventory,
             player.owned_properties,
             property_levels,
-            bank.balance
+            bank.balance,
+            player.owned_arcades,
+            player.owned_nightclubs,
+            player.owned_cars,
+            player.dirty_money,
+            day,
+            time_of_day,
+            phase_elapsed(phase_start_time),
+            player.last_arcade_collection_day,
+            player.last_club_collection_day
         )
 
     elif action == "load game":
 
-        (
-            player.money,
-            player.reputation,
-            player.inventory,
-            player.owned_properties,
-            property_levels,
-            bank.balance
-        ) = load_game()
+        saved_data = load_game()
 
-        rank_rep(
-            player.reputation,
-            shop,
-            sell_prices,
-            customer_options
-        )
+        if saved_data is not None:
+            (
+                player.money,
+                player.reputation,
+                player.inventory,
+                player.owned_properties,
+                property_levels,
+                bank.balance,
+                player.owned_arcades,
+                player.owned_nightclubs,
+                player.owned_cars,
+                player.dirty_money,
+                day,
+                time_of_day,
+                phase_elapsed_seconds,
+                player.last_arcade_collection_day,
+                player.last_club_collection_day
+            ) = saved_data
+
+            phase_start_time = phase_start_from_elapsed(phase_elapsed_seconds)
+
+            rank_rep(
+                player.reputation,
+                shop,
+                customer_options
+            )
 
     elif action == "bank":
         while True: 
@@ -349,6 +387,72 @@ while player.alive:
                     print("Restock cancelled")
 
             print("=============================")
+    
+    elif action == "buy arcade":
+        player.money, player.owned_arcades = buy_arcade(
+        player.money,
+        player.owned_arcades,
+        arcades
+        )
+
+    elif action == "collect arcade income":
+
+        if day == player.last_arcade_collection_day:
+            print("You've already collected income today")
+
+        elif not player.owned_arcades:
+            print("You don't own an arcade")
+
+        else:    
+            
+            player.money = collect_arcade_income(
+                player.money,
+                player.owned_arcades,
+                arcade_income
+            )
+
+            player.last_arcade_collection_day = day
+
+    elif action == "buy nightclub":
+        player.money, player.owned_nightclubs = buy_nightclub(
+            player.money,
+            player.owned_nightclubs,
+            nightclubs
+        )
+
+    elif action == "collect club income":
+
+        if day == player.last_club_collection_day:
+            print("You've already collected income today")
+
+        elif not player.owned_nightclubs:
+            print("You don't own any nightclubs")
+
+        else:
+            player.money = collect_nightclub_income(
+                player.owned_nightclubs,
+                player.money,
+                nightclub_income
+            )
+
+            player.last_club_collection_day = day
+
+    elif action == "buy car":
+        player.money, player.owned_cars = buy_car(
+            car_shop_inventory,
+            player.money,
+            player.owned_cars
+        )
+
+    elif action == "sell car":
+        player.money, player.owned_cars = sell_car(
+            player.owned_cars,
+            player.money,
+            car_sell_prices
+        )
+
+    elif action == "view garage":
+        show_garage(player.owned_cars)
 
     elif action == "quit":
         player.alive = False

@@ -40,3 +40,11 @@ def time_remaining(phase_start_time):
     time_left = current / 60
 
     return time_left
+
+def phase_elapsed(phase_start_time):
+
+    return time.time() - phase_start_time
+
+def phase_start_from_elapsed(elapsed_seconds):
+
+    return time.time() - elapsed_seconds
