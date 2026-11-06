@@ -1,4 +1,4 @@
-from shop import remove_item
+from businesses.shop import remove_item
 import random
 
 def complete_order(money, inventory, reputation, customer_order, sell_prices):

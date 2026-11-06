@@ -1,3 +1,5 @@
+from businesses.names import find_name
+
 
 car_shop_inventory = {
     "Tesla Model 3": 38990,
@@ -75,9 +77,9 @@ def buy_car(car_shop_inventory, money, inventory):
 
     print(f"\nAvailable Balance: ${money:,}")
 
-    car = input("\nWhich car would you like to buy? ").strip()
+    car = find_name(input("\nWhich car would you like to buy? "), car_shop_inventory)
 
-    if car not in car_shop_inventory:
+    if car is None:
         print("\n[ERROR] Vehicle not available!")
         return money, inventory
 
@@ -111,9 +113,9 @@ def sell_car(inventory, money, car_sell_prices):
     if not inventory:
         return money, inventory
 
-    car = input("\nWhich car would you like to sell? ").strip()
+    car = find_name(input("\nWhich car would you like to sell? "), inventory)
 
-    if car not in inventory or inventory[car] <= 0:
+    if car is None or inventory[car] <= 0:
         print("\n[ERROR] You don't own this vehicle!")
         return money, inventory
 
