@@ -32,6 +32,7 @@ from businesses.shop import (
     calculate_restock
 )
 from core.save_system import save_game, load_game
+from core.tax_system import INCOME_TAX_RATE, collect_tax
 from core.time_system import time_remaining
 
 
@@ -71,6 +72,14 @@ def rank_rep(reputation, shop, customer_options):
         shop["premium_coffee"] = 75
         customer_options.append("premium_coffee")
         print("NEW ITEM UNLOCKED: premium coffee")
+
+
+def pay_income_tax(player, income):
+    """Take tax out of business income the player just collected."""
+
+    # The income was just added to the player's cash, so the tax can always
+    # be paid in full and nothing is left unpaid
+    player.money, _ = collect_tax(player.money, income, INCOME_TAX_RATE)
 
 
 # ---------- Status ----------
@@ -310,11 +319,13 @@ def handle_bank(game):
 
     while True:
         bank_action = input(
-            "What do you want ? View balance, Deposit, Withdraw, Exit "
+            "What do you want ? View balance, Deposit, Withdraw, "
+            "View transactions, Borrow, Repay loan, Exit ? "
         ).strip().lower()
 
         if bank_action == "view balance":
             print(f"Bank balance: ${bank.balance}")
+            print(f"Outstanding loan: ${bank.loan_balance}")
 
         elif bank_action == "deposit":
             amount = ask_number("How much do you want to deposit? ")
@@ -323,6 +334,21 @@ def handle_bank(game):
         elif bank_action == "withdraw":
             amount = ask_number("How much do you want to withdraw ? ")
             bank.withdraw(player, amount)
+
+        elif bank_action in ("view transactions", "view transaction"):
+            bank.show_transaction()
+
+        elif bank_action == "borrow":
+            amount = ask_number("How much do you want to borrow? ")
+            bank.borrow_money(player, amount)
+
+        elif bank_action == "repay loan":
+            if bank.loan_balance <= 0:
+                print("You have no outstanding loan")
+            else:
+                print(f"You owe ${bank.loan_balance}")
+                amount = ask_number("How much do you want to repay? ")
+                bank.repay_loan(player, amount)
 
         elif bank_action == "exit":
             break
@@ -353,11 +379,15 @@ def handle_collect_arcade_income(game):
         print("You don't own an arcade")
 
     else:
+        money_before = player.money
+
         player.money = collect_arcade_income(
             player.money,
             player.owned_arcades,
             arcade_income
         )
+
+        pay_income_tax(player, player.money - money_before)
 
         player.last_arcade_collection_day = game.day
 
@@ -384,11 +414,15 @@ def handle_collect_club_income(game):
         print("You don't own any nightclubs")
 
     else:
+        money_before = player.money
+
         player.money = collect_nightclub_income(
             player.owned_nightclubs,
             player.money,
             nightclub_income
         )
+
+        pay_income_tax(player, player.money - money_before)
 
         player.last_club_collection_day = game.day
 
