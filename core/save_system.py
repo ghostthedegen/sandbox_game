@@ -66,6 +66,7 @@ def is_valid_save(data):
     return (
         is_amount(data["money"])
         and is_amount(data["bank_balance"])
+        and is_amount(data["loan_balance"])
         and is_amount(data["dirty_money"])
         and is_amount(data["phase_elapsed_seconds"])
         and is_whole_number(data["reputation"], 0)
@@ -79,6 +80,8 @@ def is_valid_save(data):
         and is_owned_list(data["owned_arcades"], arcades)
         and is_owned_list(data["owned_nightclubs"], nightclubs)
         and has_valid_levels(data["property_levels"])
+        and isinstance(data["bank_transactions"], list)
+        and all(isinstance(item, str) for item in data["bank_transactions"])
     )
 
 
@@ -92,6 +95,8 @@ def save_game(game):
         "owned_properties": player.owned_properties,
         "property_levels": game.property_levels,
         "bank_balance": game.bank.balance,
+        "bank_transactions": game.bank.transactions,
+        "loan_balance": game.bank.loan_balance,
         "owned_arcades": player.owned_arcades,
         "owned_nightclubs": player.owned_nightclubs,
         "owned_cars": player.owned_cars,
@@ -136,6 +141,8 @@ def load_game(game):
         "owned_properties": [],
         "property_levels": {"small_shop": 1},
         "bank_balance": 0,
+        "bank_transactions": [],
+        "loan_balance": 0,
         "owned_arcades": [],
         "owned_nightclubs": [],
         "owned_cars": {},
@@ -169,6 +176,8 @@ def load_game(game):
 
     game.property_levels = data["property_levels"]
     game.bank.balance = data["bank_balance"]
+    game.bank.transactions = data["bank_transactions"]
+    game.bank.loan_balance = data["loan_balance"]
     game.day = data["day"]
     game.time_of_day = data["time_of_day"]
     game.phase_start_time = phase_start_from_elapsed(

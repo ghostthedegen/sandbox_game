@@ -1,9 +1,13 @@
+MAX_LOAN = 50000
+LOAN_INTEREST_RATE = 0.1
+
+
 class BankAccount:
     def __init__(self, name):
         self.name = name
         self.balance = 0
         self.transactions = []
-        self.loan.balance = 0
+        self.loan_balance = 0
 
     def deposit(self, player, amount):
 
@@ -13,11 +17,11 @@ class BankAccount:
         elif player.money >= amount:
             player.money -= amount
             self.balance += amount
-            self.transactions.append(f"Deposit: £{amount}")
+            self.transactions.append(f"Deposit: ${amount}")
 
-            print(f"Deposited £{amount}")
-            print(f"Cash: £{player.money}")
-            print(f"Bank balance: £{self.balance}")
+            print(f"Deposited ${amount}")
+            print(f"Cash: ${player.money}")
+            print(f"Bank balance: ${self.balance}")
 
         else:
             print("Not enough cash")
@@ -30,11 +34,11 @@ class BankAccount:
         elif self.balance >= amount:
             self.balance -= amount
             player.money += amount
-            self.transactions.append(f"Withdraw: £{amount}")
+            self.transactions.append(f"Withdraw: ${amount}")
 
-            print(f"Withdrew £{amount}")
-            print(f"Cash: £{player.money}")
-            print(f"Bank balance: £{self.balance}")
+            print(f"Withdrew ${amount}")
+            print(f"Cash: ${player.money}")
+            print(f"Bank balance: ${self.balance}")
 
         else:
             print("Not enough money in the bank")
@@ -49,7 +53,7 @@ class BankAccount:
             other_account.balance += amount
 
             print(
-                f"{self.name} transferred £{amount} "
+                f"{self.name} transferred ${amount} "
                 f"to {other_account.name}"
             )
 
@@ -59,7 +63,10 @@ class BankAccount:
     def show_transaction(self):
 
         print("BANK TRANSACTION HISTORY")
-        print(f"Balance: £{self.balance}")
+        print(f"Balance: ${self.balance}")
+
+        if self.loan_balance > 0:
+            print(f"Outstanding loan: ${self.loan_balance}")
 
         if not self.transactions:
             print("No transactions found")
@@ -68,37 +75,32 @@ class BankAccount:
         for item in self.transactions:
             print(item)
 
-        depo = len(self.transactions)
-
-        print(f"Total transactions: {depo}")
+        print(f"Total transactions: {len(self.transactions)}")
 
     def borrow_money(self, player, amount):
 
-        interest = int(amount * 0.1)
-
         if amount <= 0:
             print("Loan amount must be greater than 0")
-            return
-        
-        elif amount > 50000:
-            print("Amount is to high to loan")
-            return
+
+        elif amount > MAX_LOAN:
+            print(f"Amount is too high to loan (max ${MAX_LOAN})")
 
         elif self.loan_balance > 0:
             print("You already have an outstanding loan")
-            return
 
         else:
-            print(f"You've been approved for: £{amount}")
+            interest = int(amount * LOAN_INTEREST_RATE)
             total_repayment = amount + interest
 
             player.money += amount
             self.loan_balance = total_repayment
-            print(f"Total repayment:{amount}")
-            self.transactions.append(f"Borrowed: £{amount} | Total repayment: £{total_repayment}")
-        
-        return 
+            self.transactions.append(
+                f"Borrowed: ${amount} | Total repayment: ${total_repayment}"
+            )
 
+            print(f"You've been approved for: ${amount}")
+            print(f"Total repayment: ${total_repayment}")
+            print(f"Cash: ${player.money}")
 
     def repay_loan(self, player, amount):
 
@@ -111,7 +113,7 @@ class BankAccount:
             return
 
         if amount > self.loan_balance:
-            print(f"You only owe £{self.loan_balance}")
+            print(f"You only owe ${self.loan_balance}")
             return
 
         if player.money < amount:
@@ -120,21 +122,11 @@ class BankAccount:
 
         player.money -= amount
         self.loan_balance -= amount
-        self.transactions.append(f"Loan repaid: £{amount}")
+        self.transactions.append(f"Loan repaid: ${amount}")
 
-        print(f"Paid £{amount}")
-        print(f"Remaining loan: £{self.loan_balance}")
-        print(f"Cash: £{player.money}")
+        print(f"Paid ${amount}")
+        print(f"Remaining loan: ${self.loan_balance}")
+        print(f"Cash: ${player.money}")
 
         if self.loan_balance == 0:
             print("Loan fully repaid!")
-
-
-
-
-        
-
-
-        
-
-
